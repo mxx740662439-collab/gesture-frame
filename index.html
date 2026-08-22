@@ -83,7 +83,6 @@ max-height:75vh;
 
 
 
-
 #empty{
 
 position:absolute;
@@ -111,7 +110,6 @@ font-size:18px;
 
 
 
-
 #timelineBox{
 
 width:90%;
@@ -133,7 +131,6 @@ gap:10px;
 flex:1;
 
 }
-
 
 
 
@@ -171,7 +168,6 @@ z-index:50;
 
 
 
-
 button{
 
 min-width:45px;
@@ -199,8 +195,6 @@ button:active{
 transform:scale(.95);
 
 }
-
-
 
 
 
@@ -255,13 +249,11 @@ width:100%;
 
 
 
-
 .hidden{
 
 display:none!important;
 
 }
-
 
 
 
@@ -288,6 +280,13 @@ width:100%;
 
 }
 
+
+
+#video{
+
+display:none;
+
+}
 
 
 </style>
@@ -357,15 +356,11 @@ max="100">
 
 
 
-
-
 <div id="info">
 
 等待视频
 
 </div>
-
-
 
 
 
@@ -392,9 +387,6 @@ value="0"
 
 
 </div>
-
-
-
 
 
 
@@ -436,7 +428,6 @@ onclick="toggleOnion()">
 
 
 
-
 <button onclick="toggleTraining()">
 
 训练
@@ -446,13 +437,11 @@ onclick="toggleOnion()">
 
 
 
-
 <button onclick="toggleSettings()">
 
 ⚙
 
 </button>
-
 
 
 
@@ -470,10 +459,6 @@ onclick="toggleOnion()">
 
 
 
-
-
-
-
 <div id="settings"
 class="hidden">
 
@@ -483,7 +468,6 @@ class="hidden">
 设置
 
 </h3>
-
 
 
 
@@ -499,7 +483,6 @@ accept="video/*"
 >
 
 </label>
-
 
 
 
@@ -545,9 +528,6 @@ selected>
 
 
 </label>
-
-
-
 
 
 
@@ -619,7 +599,6 @@ selected>
 
 
 
-
 <label>
 
 跳帧倍率
@@ -665,7 +644,6 @@ selected>
 
 
 
-
 <label>
 
 洋葱皮透明度
@@ -683,7 +661,6 @@ value="25"
 
 
 
-
 <button onclick="startTraining()">
 
 开始训练
@@ -692,10 +669,7 @@ value="25"
 
 
 
-
 </div>
-
-
 
 
 <video id="video" playsinline></video>
