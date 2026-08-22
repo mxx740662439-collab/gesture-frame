@@ -190,6 +190,7 @@ font-size:14px;
 
 
 
+
 button:active{
 
 transform:scale(.95);
@@ -274,11 +275,13 @@ text-align:center;
 
 
 
+
 #progressBar{
 
 width:100%;
 
 }
+
 
 
 #video{
@@ -350,7 +353,9 @@ max="100">
 
 
 
+
 </div>
+
 
 
 
@@ -450,6 +455,7 @@ onclick="toggleOnion()">
 ⛶
 
 </button>
+
 
 
 
@@ -673,7 +679,9 @@ value="25"
 
 
 
+
 <video id="video" playsinline></video>
+
 
 
 </div>
@@ -761,7 +769,7 @@ if(e.target.files[0]){
 
 
 loadVideo(
-e.target.files[0]
+ e.target.files[0]
 );
 
 
@@ -808,6 +816,7 @@ extractFrames();
 
 
 }
+
 
 
 
@@ -876,7 +885,7 @@ i++
 
 
 await seekVideo(
-i/fps
+ i/fps
 );
 
 
@@ -936,8 +945,8 @@ frameImages.push(img);
 
 
 updateProgress(
-i+1,
-total
+ i+1,
+ total
 );
 
 
@@ -998,314 +1007,4 @@ if(frames.length===0) return;
 
 canvas.width=frameImages[currentFrame].width;
 
-canvas.height=frameImages[currentFrame].height;
 
-ctx.fillStyle="#000";
-
-ctx.fillRect(0,0,canvas.width,canvas.height);
-
-ctx.drawImage(frameImages[currentFrame],0,0);
-
-if(onion && currentFrame>0){
-
-let opacity=Number(document.getElementById("onionOpacity").value)/100;
-
-ctx.globalAlpha=opacity;
-
-ctx.drawImage(frameImages[currentFrame-1],0,0);
-
-ctx.globalAlpha=1;
-
-}
-
-}
-
-
-// ============================
-// UI更新
-// ============================
-
-
-function updateTimeline(){
-
-document.getElementById("timeline").max=frames.length-1;
-
-document.getElementById("timeline").value=currentFrame;
-
-document.getElementById("frameLabel").textContent=`Frame ${currentFrame} / ${frames.length-1}`;
-
-}
-
-
-function updateInfo(){
-
-if(frames.length===0){
-
-document.getElementById("info").textContent="等待视频";
-
-}else{
-
-let timeSelect=Number(document.getElementById("timeSelect").value);
-
-document.getElementById("info").textContent=`已加载 ${frames.length} 帧 | 每帧停留 ${timeSelect}s | 总时长 ${(frames.length*timeSelect).toFixed(1)}s`;
-
-}
-
-}
-
-
-// ============================
-// 控制
-// ============================
-
-
-function nextFrame(){
-
-if(frames.length===0) return;
-
-currentFrame=(currentFrame+1)%frames.length;
-
-renderFrame();
-
-updateTimeline();
-
-}
-
-
-function prevFrame(){
-
-if(frames.length===0) return;
-
-currentFrame=(currentFrame-1+frames.length)%frames.length;
-
-renderFrame();
-
-updateTimeline();
-
-}
-
-
-function toggleOnion(){
-
-onion=!onion;
-
-document.getElementById("onionBtn").style.opacity=onion?1:0.5;
-
-renderFrame();
-
-}
-
-
-function togglePlay(){
-
-if(frames.length===0) return;
-
-playing=!playing;
-
-if(playing){
-
-playFrames();
-
-}else{
-
-clearTimeout(playTimer);
-
-}
-
-}
-
-
-async function playFrames(){
-
-if(!playing) return;
-
-let frameTime=Number(document.getElementById("timeSelect").value)*1000;
-
-nextFrame();
-
-await new Promise(resolve=>{
-
-playTimer=setTimeout(resolve,frameTime);
-
-});
-
-if(playing) playFrames();
-
-}
-
-
-function updateProgress(current,total){
-
-let percent=Math.round(current/total*100);
-
-document.getElementById("progressBar").value=percent;
-
-document.getElementById("progressText").textContent=`分析中... ${percent}%`;
-
-}
-
-
-function showProgress(show){
-
-document.getElementById("progressBox").style.display=show?"block":"none";
-
-}
-
-
-// ============================
-// 训练
-// ============================
-
-
-function toggleTraining(){
-
-if(frames.length===0) return;
-
-if(training){
-
-stopTraining();
-
-}else{
-
-startTraining();
-
-}
-
-}
-
-
-function startTraining(){
-
-if(frames.length===0) return;
-
-training=true;
-
-playing=false;
-
-clearTimeout(playTimer);
-
-let timeLimit=10*1000;
-
-let startTime=Date.now();
-
-updateTrainingInfo(timeLimit);
-
-let frameTime=Number(document.getElementById("timeSelect").value)*1000;
-
-let skipRate=Number(document.getElementById("skipSelect").value);
-
-frameTime=frameTime/skipRate;
-
-async function trainingPlay(){
-
-if(!training) return;
-
-let elapsed=Date.now()-startTime;
-
-if(elapsed>=timeLimit){
-
-stopTraining();
-
-return;
-
-}
-
-let remaining=timeLimit-elapsed;
-
-updateTrainingInfo(remaining);
-
-let skip=Number(document.getElementById("skipSelect").value);
-
-for(let i=0;i<skip;i++){
-
-if(training) nextFrame();
-
-}
-
-await new Promise(resolve=>{
-
-trainingTimer=setTimeout(resolve,frameTime);
-
-});
-
-trainingPlay();
-
-}
-
-trainingPlay();
-
-}
-
-
-function stopTraining(){
-
-training=false;
-
-clearTimeout(trainingTimer);
-
-document.getElementById("info").textContent="训练完成！";
-
-}
-
-
-function updateTrainingInfo(remaining){
-
-let seconds=Math.max(0,Math.ceil(remaining/1000));
-
-document.getElementById("info").textContent=`训练中... 剩余 ${seconds}s`;
-
-}
-
-
-// ============================
-// 其他
-// ============================
-
-
-function toggleFullscreen(){
-
-if(!document.fullscreenElement){
-
-document.documentElement.requestFullscreen().catch(err=>{
-
-console.log("全屏请求失败");
-
-});
-
-}else{
-
-document.exitFullscreen();
-
-}
-
-}
-
-
-document.getElementById("timeline").oninput=function(){
-
-currentFrame=Number(this.value);
-
-renderFrame();
-
-};
-
-
-document.getElementById("onionOpacity").oninput=function(){
-
-if(onion) renderFrame();
-
-};
-
-
-document.getElementById("timeSelect").onchange=function(){
-
-updateInfo();
-
-};
-
-
-</script>
-
-</body>
-
-</html>
