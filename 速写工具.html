@@ -81,6 +81,11 @@ max-height:75vh;
 }
 
 
+#video{
+
+display:none;
+
+}
 
 
 #empty{
@@ -279,14 +284,9 @@ text-align:center;
 width:100%;
 
 }
-
-
-
 </style>
 
-
 </head>
-
 
 
 <body>
@@ -349,11 +349,15 @@ max="100">
 
 
 
+
+
 <div id="info">
 
 等待视频
 
 </div>
+
+
 
 
 
@@ -380,6 +384,11 @@ value="0"
 
 
 </div>
+
+
+
+
+
 
 
 
@@ -452,6 +461,11 @@ onclick="toggleOnion()">
 
 
 
+
+
+
+
+
 <div id="settings"
 class="hidden">
 
@@ -461,6 +475,7 @@ class="hidden">
 设置
 
 </h3>
+
 
 
 
@@ -476,6 +491,7 @@ accept="video/*"
 >
 
 </label>
+
 
 
 
@@ -521,6 +537,10 @@ selected>
 
 
 </label>
+
+
+
+
 
 
 
@@ -592,6 +612,8 @@ selected>
 
 
 
+
+
 <label>
 
 跳帧倍率
@@ -637,6 +659,8 @@ selected>
 
 
 
+
+
 <label>
 
 洋葱皮透明度
@@ -654,6 +678,8 @@ value="25"
 
 
 
+
+
 <button onclick="startTraining()">
 
 开始训练
@@ -662,7 +688,10 @@ value="25"
 
 
 
+
 </div>
+
+
 
 
 
@@ -673,7 +702,6 @@ value="25"
 
 </div>
 <script>
-
 
 // ============================
 // Gesture Frame v1.3 Core
@@ -721,8 +749,15 @@ let timer=null;
 
 let remaining=0;
 
+
+// Safari稳定计时
+let endTime=0;
+
+
 // 点击防抖锁
-let isClickLocked = false;
+
+let isClickLocked=false;
+
 
 
 
@@ -740,6 +775,8 @@ document
 .toggle("hidden");
 
 }
+
+
 
 
 
@@ -766,6 +803,8 @@ e.target.files[0]
 
 
 };
+
+
 
 
 
@@ -809,6 +848,11 @@ extractFrames();
 
 
 
+
+
+
+
+
 // ============================
 // 抽帧
 // ============================
@@ -845,6 +889,7 @@ showProgress(true);
 
 
 
+
 let temp =
 document.createElement("canvas");
 
@@ -860,6 +905,9 @@ video.videoHeight;
 
 let tctx =
 temp.getContext("2d");
+
+
+
 
 
 
@@ -894,13 +942,11 @@ temp.toDataURL(
 
 
 
-
 frames.push(data);
 
 
 
 
-// 关键：等待图片加载
 
 let img =
 new Image();
@@ -932,6 +978,7 @@ frameImages.push(img);
 
 
 
+
 updateProgress(
 i+1,
 total
@@ -943,7 +990,11 @@ total
 
 
 
+
+
+
 showProgress(false);
+
 
 
 
@@ -955,7 +1006,9 @@ document
 
 
 
+
 setupTimeline();
+
 
 
 
@@ -968,7 +1021,13 @@ currentFrame=0;
 showFrame();
 
 
+
 }
+
+
+
+
+
 
 
 
@@ -978,26 +1037,39 @@ function seekVideo(time){
 
 return new Promise(resolve=>{
 
+
 video.currentTime=time;
+
 
 video.onseeked=function(){
 
+
 resolve();
+
 
 };
 
+
+
 });
+
 
 }
 
 
 
 
+
+
+
+
 // ============================
-// 进度条
+// 进度显示
 // ============================
 
+
 function showProgress(show){
+
 
 document
 .getElementById("progressBox")
@@ -1027,27 +1099,24 @@ document
 Frame ${now}/${total}
 `;
 
+
+
 }
-
-
-
-
 // ============================
-// 显示帧（洋葱皮
+// 显示帧（洋葱皮）
 // ============================
+
 
 function showFrame(){
 
 
-if(
-frameImages.length===0
-)
+if(frameImages.length===0)
 return;
+
 
 
 let current =
 frameImages[currentFrame];
-
 
 
 
@@ -1057,7 +1126,6 @@ current.naturalWidth;
 
 canvas.height =
 current.naturalHeight;
-
 
 
 
@@ -1071,9 +1139,7 @@ canvas.height
 
 
 
-// -----------------------
-// 绘制当前帧
-// -----------------------
+// 当前帧
 
 ctx.globalAlpha=1;
 
@@ -1089,18 +1155,16 @@ canvas.height
 
 
 
-// -----------------------
-// 洋葱皮透明度
-// -----------------------
+// 洋葱皮
 
 if(
 onion &&
 currentFrame>0
 ){
 
+
 let previous =
 frameImages[currentFrame-1];
-
 
 
 
@@ -1113,10 +1177,8 @@ document
 
 
 
-
 ctx.globalAlpha =
 opacity;
-
 
 
 
@@ -1130,31 +1192,38 @@ canvas.height
 
 
 
-
 ctx.globalAlpha=1;
 
-}
 
+
+}
 
 
 
 updateInfo();
 
 
+
 }
 
 
 
 
+
+
+
+
+
 // ============================
-// 时间轴工具
+// 时间轴
 // ============================
+
 
 function setupTimeline(){
 
+
 let bar =
-document
-.getElementById("timeline");
+document.getElementById("timeline");
 
 
 
@@ -1186,12 +1255,18 @@ showFrame();
 
 };
 
+
+
 }
 
 
 
 
+
+
+
 function updateInfo(){
+
 
 document
 .getElementById("frameLabel")
@@ -1209,28 +1284,37 @@ currentFrame;
 
 
 
-if(playing){
-
 document
 .getElementById("info")
 .innerHTML =
-`⏱️ ${Math.ceil(remaining/1000)} 秒`;
+playing?
+`
+剩余 ${remaining} 秒
+`
+:
+`
+已暂停
+`;
 
-}else{
 
-document
-.getElementById("info")
-.innerHTML =
-`已暂停`;
 
 }
 
-}
+
+
+
+
+
+
+
+
 // ============================
-// 下一帧
+// 翻帧
 // ============================
+
 
 function nextFrame(){
+
 
 pauseTraining();
 
@@ -1261,12 +1345,14 @@ currentFrame=0;
 
 showFrame();
 
+
 }
 
 
 
 
 function prevFrame(){
+
 
 pauseTraining();
 
@@ -1276,9 +1362,8 @@ currentFrame--;
 
 
 
-if(
-currentFrame<0
-){
+if(currentFrame<0){
+
 currentFrame =
 frames.length-1;
 
@@ -1288,17 +1373,24 @@ frames.length-1;
 
 showFrame();
 
+
+
 }
 
 
 
 
+
+
+
+
+
 // ============================
-// 洋葱皮开关
+// 洋葱皮
 // ============================
+
 
 function toggleOnion(){
-
 
 
 onion=!onion;
@@ -1317,22 +1409,27 @@ onion?
 showFrame();
 
 
+
 }
 
 
 
 
+
+
+
+
+
 // ============================
-// 训练模式控制
+// 训练模式
 // ============================
+
 
 function startTraining(){
 
 
+if(frames.length===0){
 
-if(
-frames.length===0
-){
 
 alert(
 "请先上传视频"
@@ -1342,11 +1439,14 @@ alert(
 
 return;
 
+
 }
 
 
 
 startPlay();
+
+
 
 }
 
@@ -1355,96 +1455,171 @@ startPlay();
 
 function toggleTraining(){
 
+
 if(playing){
+
 
 stopPlay();
 
-}
-else{
+
+}else{
+
 
 startPlay();
 
-}
-
 
 }
 
 
 
+}
 
-// ============================
-// 播放/暂停（修复iPad bug）
-// ============================
+
+
 
 function togglePlay(){
 
-// 防止重复点击（防抖）
-if (isClickLocked) return;
-isClickLocked = true;
-setTimeout(() => { isClickLocked = false; }, 300);
+
+
+if(isClickLocked)
+return;
+
+
+
+isClickLocked=true;
+
+
+setTimeout(()=>{
+
+isClickLocked=false;
+
+},300);
+
+
 
 toggleTraining();
+
+
 
 }
 
 
+
+
+
+
+
+
+
+// ============================
+// 播放计时（Safari修正版）
+// ============================
 
 
 function startPlay(){
 
-// 确保清除旧定时器
-if (timer) clearInterval(timer);
 
-if(
-frames.length===0
-){
+if(timer){
 
-alert(
-"请先上传视频"
+clearInterval(timer);
+
+timer=null;
+
+}
+
+
+
+let seconds =
+Number(
+document
+.getElementById("timeSelect")
+.value
 );
 
 
 
+playing=true;
+
+
+
+endTime =
+Date.now()+seconds*1000;
+
+
+
+remaining=seconds;
+
+document
+.getElementById("info")
+.innerHTML =
+`
+剩余 ${remaining} 秒
+`;
+
+
+
+
+
+timer=setInterval(()=>{
+
+
+if(!playing)
 return;
 
+
+
+remaining =
+Math.ceil(
+(endTime-Date.now())/1000
+);
+
+
+
+if(remaining < 0){
+    remaining = 0;
 }
 
 
 
-let frameDelay = Number(
-document
-.getElementById("timeSelect")
-.value
-) * 1000;
+if(remaining<=0){
 
-playing = true;
-remaining = frameDelay;
 
-timer = setInterval(()=>{
-
-if(!playing) return;
-
-remaining -= 100;
-
-if(remaining <= 0){
 
 trainingNext();
 
-remaining = frameDelay;
+
+
+endTime =
+Date.now()+seconds*1000;
+
+
+
+remaining=seconds;
+
+
 
 }
+
+
 
 updateInfo();
 
-},100);
+
+
+},200);
+
+
 
 }
+
+
+
+
 
 
 
 
 function trainingNext(){
-
 
 
 let skip =
@@ -1472,78 +1647,110 @@ currentFrame=0;
 
 showFrame();
 
+
+
 }
+
+
+
+
 
 
 
 
 function stopPlay(){
 
-if (timer) {
+
+if(timer){
+
+
 clearInterval(timer);
-timer = null;
+
+
+timer=null;
+
+
 }
+
+
 
 playing=false;
 
-remaining = 0;
+
+remaining=0;
+
 
 updateInfo();
 
 
 
 }
+
+
+
 
 
 
 
 function pauseTraining(){
 
+
 playing=false;
+
 
 if(timer){
 
+
 clearInterval(timer);
 
-timer = null;
+
+timer=null;
+
 
 }
+
 
 updateInfo();
 
 
 
 }
-
-
-
-
 // ============================
 // 全屏
 // ============================
 
-function toggleFullscreen(){
 
+function toggleFullscreen(){
 
 
 if(
 !document.fullscreenElement
 ){
 
+
 document
 .documentElement
 .requestFullscreen();
 
+
 }
 else{
+
 
 document
 .exitFullscreen();
 
+
 }
 
 
+
 }
+
+
+
+
+
 
 
 
@@ -1552,20 +1759,26 @@ document
 // 键盘快捷键
 // ============================
 
+
 document
 .addEventListener(
 "keydown",
 e=>{
 
+
 if(
 e.code==="Space"
 ){
 
+
 e.preventDefault();
+
 
 togglePlay();
 
+
 }
+
 
 
 
@@ -1573,9 +1786,12 @@ if(
 e.key==="ArrowRight"
 ){
 
+
 nextFrame();
 
+
 }
+
 
 
 
@@ -1583,9 +1799,12 @@ if(
 e.key==="ArrowLeft"
 ){
 
+
 prevFrame();
 
+
 }
+
 
 
 
@@ -1593,18 +1812,26 @@ if(
 e.key==="o"
 ){
 
+
 toggleOnion();
 
+
 }
+
+
 
 
 if(
 e.key==="f"
 ){
 
+
 toggleFullscreen();
 
+
 }
+
+
 
 
 });
@@ -1615,5 +1842,6 @@ toggleFullscreen();
 
 
 </body>
+
 
 </html>
