@@ -718,13 +718,15 @@ let onion=false;
 
 
 
-// 训练
+// 播放/训练状态
 
 let playing=false;
 
-let timer=null;
+let training=false;
 
-let remaining=0;
+let playTimer=null;
+
+let trainingTimer=null;
 
 
 
@@ -1045,8 +1047,6 @@ document.getElementById("info").textContent="等待视频";
 
 let timeSelect=Number(document.getElementById("timeSelect").value);
 
-let displayTime=(timeSelect*1000-500);
-
 document.getElementById("info").textContent=`已加载 ${frames.length} 帧 | 每帧停留 ${timeSelect}s | 总时长 ${(frames.length*timeSelect).toFixed(1)}s`;
 
 }
@@ -1108,7 +1108,7 @@ playFrames();
 
 }else{
 
-clearTimeout(timer);
+clearTimeout(playTimer);
 
 }
 
@@ -1121,25 +1121,13 @@ if(!playing) return;
 
 let frameTime=Number(document.getElementById("timeSelect").value)*1000;
 
-let skipRate=Number(document.getElementById("skipSelect").value);
-
 nextFrame();
-
-remaining=frameTime;
-
-while(playing && remaining>0){
 
 await new Promise(resolve=>{
 
-let step=Math.min(100,remaining);
-
-timer=setTimeout(resolve,step);
-
-remaining-=step;
+playTimer=setTimeout(resolve,frameTime);
 
 });
-
-}
 
 if(playing) playFrames();
 
@@ -1171,13 +1159,13 @@ document.getElementById("progressBox").style.display=show?"block":"none";
 
 function toggleTraining(){
 
-let content=document.getElementById("info").textContent;
+if(frames.length===0) return;
 
-if(content.includes("训练中")){
+if(training){
 
-document.getElementById("info").textContent=content.replace("训练中","");
+stopTraining();
 
-}else if(frames.length>0){
+}else{
 
 startTraining();
 
@@ -1190,55 +1178,81 @@ function startTraining(){
 
 if(frames.length===0) return;
 
+training=true;
+
+playing=false;
+
+clearTimeout(playTimer);
+
 let timeLimit=10*1000;
 
 let startTime=Date.now();
 
-document.getElementById("info").textContent=`训练中... 剩余 ${(timeLimit/1000).toFixed(0)}s`;
+updateTrainingInfo(timeLimit);
 
-function trainingTick(){
+let frameTime=Number(document.getElementById("timeSelect").value)*1000;
+
+let skipRate=Number(document.getElementById("skipSelect").value);
+
+frameTime=frameTime/skipRate;
+
+async function trainingPlay(){
+
+if(!training) return;
 
 let elapsed=Date.now()-startTime;
 
-let remaining=Math.max(0,timeLimit-elapsed);
+if(elapsed>=timeLimit){
 
-if(remaining<=0){
-
-document.getElementById("info").textContent="训练完成！";
+stopTraining();
 
 return;
 
 }
 
-document.getElementById("info").textContent=`训练中... 剩余 ${(remaining/1000).toFixed(0)}s`;
+let remaining=timeLimit-elapsed;
 
-setTimeout(trainingTick,100);
-
-}
-
-trainingTick();
-
-let skipRate=Number(document.getElementById("skipSelect").value);
-
-let frameTime=Number(document.getElementById("timeSelect").value)*1000/skipRate;
-
-let startFrame=currentFrame;
-
-async function trainingPlay(){
-
-if(Date.now()-startTime>=timeLimit) return;
+updateTrainingInfo(remaining);
 
 let skip=Number(document.getElementById("skipSelect").value);
 
-for(let i=0;i<skip;i++) nextFrame();
+for(let i=0;i<skip;i++){
 
-await new Promise(resolve=>setTimeout(resolve,frameTime));
+if(training) nextFrame();
+
+}
+
+await new Promise(resolve=>{
+
+trainingTimer=setTimeout(resolve,frameTime);
+
+});
 
 trainingPlay();
 
 }
 
 trainingPlay();
+
+}
+
+
+function stopTraining(){
+
+training=false;
+
+clearTimeout(trainingTimer);
+
+document.getElementById("info").textContent="训练完成！";
+
+}
+
+
+function updateTrainingInfo(remaining){
+
+let seconds=Math.max(0,Math.ceil(remaining/1000));
+
+document.getElementById("info").textContent=`训练中... 剩余 ${seconds}s`;
 
 }
 
