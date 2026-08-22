@@ -137,7 +137,6 @@ flex:1;
 
 
 
-
 #toolbar{
 
 position:fixed;
@@ -167,7 +166,6 @@ z-index:50;
 
 
 }
-
 
 
 
@@ -204,7 +202,6 @@ transform:scale(.95);
 
 
 
-
 #settings{
 
 position:fixed;
@@ -233,7 +230,6 @@ z-index:100;
 
 
 
-
 #settings label{
 
 display:block;
@@ -241,7 +237,6 @@ display:block;
 margin-bottom:15px;
 
 }
-
 
 
 
@@ -255,13 +250,11 @@ width:100%;
 
 
 
-
 .hidden{
 
 display:none!important;
 
 }
-
 
 
 
@@ -392,6 +385,7 @@ value="0"
 
 
 </div>
+
 
 
 
@@ -551,7 +545,6 @@ selected>
 
 
 
-
 <label>
 
 每帧停留时间
@@ -700,6 +693,7 @@ value="25"
 
 
 
+
 <video id="video" playsinline></video>
 
 
@@ -758,7 +752,6 @@ let remaining=0;
 
 
 
-
 // ============================
 // 设置
 // ============================
@@ -802,6 +795,7 @@ e.target.files[0]
 
 
 };
+
 
 
 
@@ -888,7 +882,6 @@ showProgress(true);
 
 
 
-
 let temp =
 document.createElement("canvas");
 
@@ -910,13 +903,11 @@ temp.getContext("2d");
 
 
 
-
 for(
 let i=0;
 i<total;
 i++
 ){
-
 
 
 await seekVideo(
@@ -946,7 +937,6 @@ frames.push(data);
 
 
 
-
 // 关键：等待图片加载
 
 let img =
@@ -964,7 +954,6 @@ resolve();
 };
 
 
-
 img.src=data;
 
 
@@ -973,9 +962,7 @@ img.src=data;
 
 
 
-
 frameImages.push(img);
-
 
 
 
@@ -994,789 +981,6 @@ total
 
 
 
-
 showProgress(false);
 
 
-
-
-document
-.getElementById("empty")
-.style.display="none";
-
-
-
-
-setupTimeline();
-
-
-
-currentFrame=0;
-
-
-
-showFrame();
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
-function seekVideo(time){
-
-
-return new Promise(resolve=>{
-
-
-video.currentTime=time;
-
-
-video.onseeked=function(){
-
-resolve();
-
-};
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-
-// ============================
-// 进度
-// ============================
-
-
-function showProgress(show){
-
-
-document
-.getElementById("progressBox")
-.style.display =
-show?
-"block":
-"none";
-
-
-}
-
-
-
-
-
-function updateProgress(now,total){
-
-
-document
-.getElementById("progressBar")
-.value =
-now/total*100;
-
-
-
-document
-.getElementById("progressText")
-.innerHTML =
-`
-Frame ${now}/${total}
-`;
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ============================
-// 显示帧（修正版）
-// ============================
-
-
-function showFrame(){
-
-
-
-if(
-frameImages.length===0
-)
-return;
-
-
-
-let current =
-frameImages[currentFrame];
-
-
-
-
-canvas.width =
-current.naturalWidth;
-
-
-canvas.height =
-current.naturalHeight;
-
-
-
-
-
-ctx.clearRect(
-0,
-0,
-canvas.width,
-canvas.height
-);
-
-
-
-
-
-
-// ------------------------
-// 当前帧
-// ------------------------
-
-
-ctx.globalAlpha=1;
-
-
-
-ctx.drawImage(
-current,
-0,
-0,
-canvas.width,
-canvas.height
-);
-
-
-
-
-
-
-// ------------------------
-// 洋葱皮覆盖
-// ------------------------
-
-
-if(
-onion &&
-currentFrame>0
-){
-
-console.log(
-"洋葱测试",
-"当前:",
-currentFrame,
-"总帧:",
-frameImages.length,
-"上一帧:",
-frameImages[currentFrame-1],
-"当前图:",
-frameImages[currentFrame]
-);
-
-
-let previous =
-frameImages[currentFrame-1];
-
-
-
-let opacity =
-Number(
-document
-.getElementById("onionOpacity")
-.value
-)/100;
-
-
-
-
-ctx.globalAlpha =
-opacity;
-
-
-
-ctx.drawImage(
-previous,
-0,
-0,
-canvas.width,
-canvas.height
-);
-
-
-
-ctx.globalAlpha=1;
-
-
-
-}
-
-
-
-
-
-
-
-updateInfo();
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ============================
-// 时间轴
-// ============================
-
-
-function setupTimeline(){
-
-
-let bar =
-document
-.getElementById("timeline");
-
-
-
-bar.max =
-frames.length-1;
-
-
-
-bar.value=0;
-
-
-
-bar.oninput=function(){
-
-
-
-pauseTraining();
-
-
-
-currentFrame =
-Number(this.value);
-
-
-
-showFrame();
-
-
-
-};
-
-
-
-}
-
-
-
-
-
-
-
-function updateInfo(){
-
-
-document
-.getElementById("frameLabel")
-.innerHTML =
-`
-Frame ${currentFrame+1}/${frames.length}
-`;
-
-
-
-document
-.getElementById("timeline")
-.value =
-currentFrame;
-
-
-
-document
-.getElementById("info")
-.innerHTML =
-playing?
-`
-剩余 ${remaining} 秒
-`
-:
-`
-查看模式
-`;
-
-
-
-}
-// ============================
-// 翻帧
-// ============================
-
-
-function nextFrame(){
-
-
-pauseTraining();
-
-
-
-let skip =
-Number(
-document
-.getElementById("skipSelect")
-.value
-);
-
-
-
-currentFrame += skip;
-
-
-
-if(
-currentFrame>=frames.length
-){
-
-currentFrame=0;
-
-}
-
-
-
-showFrame();
-
-
-}
-
-
-
-
-
-function prevFrame(){
-
-
-pauseTraining();
-
-
-
-currentFrame--;
-
-
-
-if(
-currentFrame<0
-){
-
-currentFrame =
-frames.length-1;
-
-}
-
-
-
-showFrame();
-
-
-
-}
-
-
-
-
-
-
-
-// ============================
-// 洋葱皮按钮
-// ============================
-
-
-function toggleOnion(){
-
-
-
-onion=!onion;
-
-
-
-document
-.getElementById("onionBtn")
-.innerText =
-onion?
-"洋葱 ON":
-"洋葱皮";
-
-
-
-showFrame();
-
-
-
-}
-
-
-
-
-
-
-
-// ============================
-// 训练模式
-// ============================
-
-
-function startTraining(){
-
-
-
-if(
-frames.length===0
-){
-
-alert(
-"请先上传视频"
-);
-
-
-return;
-
-
-}
-
-
-
-playing=true;
-
-
-
-remaining =
-Number(
-document
-.getElementById("timeSelect")
-.value
-);
-
-
-
-runTimer();
-
-
-
-}
-
-
-
-
-
-function toggleTraining(){
-
-
-if(playing){
-
-
-pauseTraining();
-
-
-}
-else{
-
-
-startTraining();
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-function togglePlay(){
-
-
-toggleTraining();
-
-
-}
-
-
-
-
-
-
-
-function runTimer(){
-
-
-
-clearInterval(timer);
-
-
-
-timer =
-setInterval(()=>{
-
-
-
-if(!playing)
-return;
-
-
-
-remaining--;
-
-
-
-if(
-remaining<=0
-){
-
-
-
-trainingNext();
-
-
-
-remaining =
-Number(
-document
-.getElementById("timeSelect")
-.value
-);
-
-
-
-}
-
-
-
-updateInfo();
-
-
-
-},1000);
-
-
-
-}
-
-
-
-
-
-
-
-function trainingNext(){
-
-
-
-let skip =
-Number(
-document
-.getElementById("skipSelect")
-.value
-);
-
-
-
-currentFrame += skip;
-
-
-
-if(
-currentFrame>=frames.length
-){
-
-currentFrame=0;
-
-}
-
-
-
-showFrame();
-
-
-
-}
-
-
-
-
-
-
-function pauseTraining(){
-
-
-playing=false;
-
-
-clearInterval(timer);
-
-
-updateInfo();
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ============================
-// 全屏
-// ============================
-
-
-function toggleFullscreen(){
-
-
-
-if(
-!document.fullscreenElement
-){
-
-
-document
-.documentElement
-.requestFullscreen();
-
-
-}
-else{
-
-
-document
-.exitFullscreen();
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-// ============================
-// 键盘控制
-// ============================
-
-
-document
-.addEventListener(
-"keydown",
-e=>{
-
-
-if(
-e.code==="Space"
-){
-
-e.preventDefault();
-
-togglePlay();
-
-}
-
-
-
-if(
-e.key==="ArrowRight"
-){
-
-nextFrame();
-
-}
-
-
-
-if(
-e.key==="ArrowLeft"
-){
-
-prevFrame();
-
-}
-
-
-
-if(
-e.key==="o"
-){
-
-toggleOnion();
-
-}
-
-
-
-if(
-e.key==="f"
-){
-
-toggleFullscreen();
-
-}
-
-
-
-});
-
-
-
-
-</script>
-
-
-</body>
-
-</html>
