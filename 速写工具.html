@@ -656,7 +656,7 @@ value="25"
 
 <button onclick="startTraining()">
 
-开始训���
+开始训练
 
 </button>
 
@@ -1209,15 +1209,21 @@ currentFrame;
 
 
 
+if(playing){
+
 document
 .getElementById("info")
 .innerHTML =
-playing?
-`
-正在播放 ${remaining} 秒
-`:
-`
-已暂停`;
+`⏱️ ${Math.ceil(remaining/1000)} 秒`;
+
+}else{
+
+document
+.getElementById("info")
+.innerHTML =
+`已暂停`;
+
+}
 
 }
 // ============================
@@ -1412,19 +1418,19 @@ document
 ) * 1000;
 
 playing = true;
-remaining = frameDelay/1000;
+remaining = frameDelay;
 
 timer = setInterval(()=>{
 
 if(!playing) return;
 
-remaining -= 0.1;
+remaining -= 100;
 
 if(remaining <= 0){
 
 trainingNext();
 
-remaining = frameDelay/1000;
+remaining = frameDelay;
 
 }
 
