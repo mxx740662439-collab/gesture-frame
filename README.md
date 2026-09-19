@@ -20,14 +20,7 @@ python3 -m http.server 8080
 
 然后访问 `http://localhost:8080`。
 
-## 部署到 GitHub Pages
 
-1. 在 GitHub 新建一个仓库。
-2. 将本目录中的 `index.html`、`styles.css`、`app.js` 和 `README.md` 上传到仓库根目录。
-3. 打开仓库的 `Settings` → `Pages`。
-4. 在 `Build and deployment` 中选择 `Deploy from a branch`。
-5. Branch 选择 `main`，目录选择 `/(root)`，点击 `Save`。
-6. 等待 GitHub 给出公开访问地址。
 
 ## 快捷键
 
