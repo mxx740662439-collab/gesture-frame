@@ -1,0 +1,41 @@
+# Gesture Frame
+
+一个用于动态速写练习的纯前端工具：上传 10 秒以内的视频，在浏览器本地拆分为静态帧，并按照指定时间自动逐帧切换。
+
+## 功能
+
+- 支持 6 / 8 / 12 / 24 FPS 抽帧
+- 支持 1 / 2 / 5 / 10 / 15 / 30 / 60 秒切换间隔
+- 倒计时、逐帧切换、时间轴、洋葱皮和全屏
+- 手机、平板和电脑响应式布局
+- 视频仅在本机浏览器中处理，不会上传到服务器
+
+## 本地使用
+
+直接打开 `index.html` 即可。部分浏览器对本地文件有限制时，可以在项目目录启动静态服务器：
+
+```bash
+python3 -m http.server 8080
+```
+
+然后访问 `http://localhost:8080`。
+
+## 部署到 GitHub Pages
+
+1. 在 GitHub 新建一个仓库。
+2. 将本目录中的 `index.html`、`styles.css`、`app.js` 和 `README.md` 上传到仓库根目录。
+3. 打开仓库的 `Settings` → `Pages`。
+4. 在 `Build and deployment` 中选择 `Deploy from a branch`。
+5. Branch 选择 `main`，目录选择 `/(root)`，点击 `Save`。
+6. 等待 GitHub 给出公开访问地址。
+
+## 快捷键
+
+- 空格：播放 / 暂停
+- 左右方向键：上一帧 / 下一帧
+- O：切换洋葱皮
+- F：切换全屏
+
+## 浏览器建议
+
+推荐使用最新版 Chrome、Edge、Safari 或 Firefox。视频解码能力取决于浏览器，优先使用 MP4、MOV 或 WebM 格式。
